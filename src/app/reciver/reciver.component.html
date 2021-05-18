@@ -33,4 +33,12 @@
       <span class="h2" *ngFor="let content of checkedContent">{{content.binaryCode | slice : 1}} </span>
     </div>
   </div>
+  <div class="row">
+    <div class="col-2">
+      <p>Tekst na wyjściu:</p>
+    </div>
+    <div class="col-10">
+      <span class="h2">{{decodedText}} </span>
+    </div>
+  </div>
 </div>

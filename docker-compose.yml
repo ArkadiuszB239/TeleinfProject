@@ -1,0 +1,7 @@
+version: '3'
+services:
+  angular-ui:
+    image: arekb112/teleinf_project:latest
+    ports:
+      - "80:80"
+    container_name: teleinf_project

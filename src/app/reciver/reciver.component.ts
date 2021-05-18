@@ -10,6 +10,7 @@ import {Mark} from "../models/mark";
 })
 export class ReciverComponent implements OnInit {
 
+  decodedText = '';
   codedContent = '';
   codingTypeCode = '';
   checkedContent: Array<Mark> = [];
@@ -21,7 +22,11 @@ export class ReciverComponent implements OnInit {
       this.codingTypeCode = data;
       this.clear();
     })
-    this.codingService.getCheckedContent().subscribe((data:Array<Mark>) => this.checkedContent = data);
+    this.codingService.getCheckedContent().subscribe((data:Array<Mark>) => {
+      this.checkedContent = data;
+
+      this.decodedText = this.codingService.convertMarkArrayToText(this.checkedContent);
+    });
   }
 
   checkEncodedContent(): void {

@@ -44,6 +44,10 @@ export class CodingService {
     this.checkedContentObs.next(this.checkedContent);
   }
 
+  convertMarkArrayToText(content: Array<Mark>): string{
+    return content.map(data => String.fromCharCode(parseInt(data.binaryCode.slice(1),2))).join('');
+  }
+
   isEven(number: number): boolean {
     return number % 2 == 0;
   }
