@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="row">
+    <h2 class="text-decoration-underline">Odbiorca:</h2>
+  </div>
+  <div class="row">
+    <form class="form-inline">
+      <div class="form-group mx-sm-3 mb-2">
+        <label for="decodingContent" class="sr-only">Zakodowany ciąg znaków</label>
+        <input type="text" [(ngModel)]="codedContent" name="content" class="form-control" id="decodingContent"
+               value="{{codedContent}}">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2" (click)="checkEncodedContent()"
+              [disabled]="codedContent === ''">Dekoduj
+      </button>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-2">
+      <p>Zakodowany ciąg znaków po korekcji:</p>
+    </div>
+    <div class="col-10">
+      <span class="h2" *ngFor="let content of checkedContent">
+        <span class="text-warning">{{content.binaryCode | getBits : 0}}</span>
+        <span [ngClass]="content.isCorrect ? 'text-success' : 'text-danger'">{{content.binaryCode | slice : 1}} </span>
+      </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2">
+      <p>Dane wyjściowe:</p>
+    </div>
+    <div class="col-10">
+      <span class="h2" *ngFor="let content of checkedContent">{{content.binaryCode | slice : 1}} </span>
+    </div>
+  </div>
+</div>

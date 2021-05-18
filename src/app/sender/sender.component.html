@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row">
+    <h2 class="text-decoration-underline">Nadawca:</h2>
+  </div>
+  <div class="row">
+    <form class="form-inline">
+      <div class="form-group mx-sm-3 mb-2">
+        <label for="codingContent" class="sr-only">Ciąg znaków do zakodowania</label>
+        <input type="text" [(ngModel)]="codingContent" name="content" class="form-control" id="codingContent"
+               value="{{codingContent}}">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2" (click)="code()" [disabled]="codingContent === ''">Koduj
+      </button>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col col-lg-2">
+      <p>Ciąg znaków w notacji bitowej:</p>
+    </div>
+    <div class="col-10">
+      <textarea class="w-100" id="codedContent" value="{{binaryContent}}" disabled></textarea>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-lg-2">
+      <p>Zakodowany ciąg bitowy:</p>
+    </div>
+    <div class="col-10">
+      <textarea class="w-100" id="binaryContent" value="{{codedContent}}" disabled></textarea>
+    </div>
+  </div>
+</div>
