@@ -7,9 +7,9 @@
       <div class="form-group mx-sm-3 mb-2">
         <label for="decodingContent" class="sr-only">Zakodowany ciąg znaków</label>
         <input type="text" [(ngModel)]="codedContent" name="content" class="form-control" id="decodingContent"
-               value="{{codedContent}}">
+               value="{{codedContent}}" [maxLength]="codedLenght">
       </div>
-      <button type="submit" class="btn btn-primary mb-2" (click)="checkEncodedContent()"
+      <button type="submit" class="btn btn-primary mb-2" (click)="code()"
               [disabled]="codedContent === ''">Dekoduj
       </button>
     </form>

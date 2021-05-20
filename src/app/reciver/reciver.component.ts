@@ -12,12 +12,16 @@ export class ReciverComponent implements OnInit {
 
   decodedText = '';
   codedContent = '';
+  codedLenght = 0;
   codingTypeCode = '';
   checkedContent: Array<Mark> = [];
   constructor(private codingService: CodingService, private activeCoding: ActiveCodingService) { }
 
   ngOnInit(): void {
-    this.codingService.getCodedContent().subscribe(data => this.codedContent = data);
+    this.codingService.getCodedContent().subscribe(data => {
+      this.codedContent = data;
+      this.codedLenght = data.length;
+    });
     this.activeCoding.getCodingTypeCode().subscribe(data => {
       this.codingTypeCode = data;
       this.clear();
@@ -29,8 +33,20 @@ export class ReciverComponent implements OnInit {
     });
   }
 
-  checkEncodedContent(): void {
-    this.codingService.checkCorrectionEncodedContent(this.codedContent);
+  code(): void {
+    switch (this.codingTypeCode) {
+      case 'PARI': {
+        this.codingService.checkCorrectionEncodedContent(this.codedContent);
+        break;
+      }
+      case 'HAMM':{
+        console.log('HAMM console log!');
+        break;
+      }
+      default: {
+        throw new Error('Error while selecting coding type');
+      }
+    }
   }
 
   clear(): void{

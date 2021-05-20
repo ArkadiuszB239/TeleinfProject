@@ -33,7 +33,8 @@ export class SenderComponent implements OnInit {
         break;
       }
       case 'HAMM':{
-        console.log('HAMM console log!');
+        this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
+        this.codingService.codeBinaryArrayWithHamming(this.binaryContent);
         break;
       }
       default: {
