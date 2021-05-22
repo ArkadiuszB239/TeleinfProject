@@ -30,7 +30,7 @@ export class ReciverComponent implements OnInit {
     })
     this.codingService.getCheckedContent().subscribe((data: Array<Mark>) => {
       this.checkedContent = data;
-      this.decodeBinaryContentToText(this.checkedContent);
+      this.decodeBinaryContentToText();
     });
   }
 
