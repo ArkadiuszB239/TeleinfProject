@@ -46,7 +46,7 @@ export class CodingService {
   }
 
   convertMarkArrayToText(content: Array<Mark>): string {
-    return content.map(data => String.fromCharCode(parseInt(data.binaryCode.slice(1), 2))).join('');
+    return content.map(data => String.fromCharCode(parseInt(data.binaryCode, 2))).join('');
   }
 
   isEven(number: number): boolean {
@@ -56,24 +56,16 @@ export class CodingService {
   //hamming
 
   codeBinaryArrayWithHamming(content: string): void {
+    let indexes = [3, 7, 9, 10];
     let binaryContentWithZeros = content.split(' ').map(content => this.insertZerosControlBits(content));
-    console.log(binaryContentWithZeros);
-    let onesIndexes = binaryContentWithZeros.map(content => {
-      let tmp = this.reverseString(content);
-      let controlBitsIndexes = '';
-      for (let i = 1; i <= tmp.length; i++) {
-        if (tmp.charAt(i - 1) == '1') controlBitsIndexes = controlBitsIndexes + i.toString() + ' ';
-      }
-      controlBitsIndexes = controlBitsIndexes.substring(0, controlBitsIndexes.length-1);
-      return controlBitsIndexes;
-    })
-    console.log(onesIndexes);
+
+    let onesIndexes = this.getControlBitsIndexes(binaryContentWithZeros);
+
     for (let i = 0; i < onesIndexes.length; i++) {
       let tmp = this.convertIndexesArrayToBinaryString(onesIndexes[i]).split(' ');
-      let indexes = [3, 7, 9, 10];
       for (let j = 0; j < 4; j++) {
-        let tmp2 = tmp.map(data => data.charAt(j))
-        if(!this.isEven(tmp2.map(number => parseInt(number)).reduce((sum, x) => sum + x))){
+        let tmp2 = tmp.map(data => data.charAt(j));
+        if (!this.isEven(tmp2.map(number => parseInt(number)).reduce((sum, x) => sum + x))) {
           binaryContentWithZeros[i] = this.replaceAt(binaryContentWithZeros[i], indexes[j], '1');
         } else {
           binaryContentWithZeros[i] = this.replaceAt(binaryContentWithZeros[i], indexes[j], '0');
@@ -81,12 +73,46 @@ export class CodingService {
       }
     }
     this.codedContentObs.next(binaryContentWithZeros.join(' '));
+    this.checkedContentBeforeCorrObs.next(binaryContentWithZeros.map(data => ({binaryCode: data})));
   }
 
-  convertIndexesArrayToBinaryString(indexesArray: string): string{
+  decodeBinaryContentCodedWithHamming(content: string): void {
+    let binaryContent = content.split(' ');
+
+    let onesIndexes = this.getControlBitsIndexes(binaryContent);
+    for (let i = 0; i < onesIndexes.length; i++) {
+      let tmp = this.convertIndexesArrayToBinaryString(onesIndexes[i]).split(' ');
+      let mod2Sum = '';
+      for (let j = 0; j < 4; j++) {
+        let tmp2 = tmp.map(data => data.charAt(j));
+        if (!this.isEven(tmp2.map(number => parseInt(number)).reduce((sum, x) => sum + x))) {
+          mod2Sum = mod2Sum.concat('1');
+        } else {
+          mod2Sum = mod2Sum.concat('0');
+        }
+      }
+      this.checkedContent[i] = ({binaryCode: binaryContent[i], hammingCorrectedBit: parseInt(mod2Sum, 2) == 0 ? -1: parseInt(mod2Sum, 2) - 1});
+    }
+    console.log(this.checkedContent);
+    this.checkedContentObs.next(this.checkedContent);
+  }
+
+  getControlBitsIndexes(content: Array<string>): Array<string> {
+    return content.map(content => {
+      let tmp = this.reverseString(content);
+      let controlBitsIndexes = '';
+      for (let i = 1; i <= tmp.length; i++) {
+        if (tmp.charAt(i - 1) == '1') controlBitsIndexes = controlBitsIndexes + i.toString() + ' ';
+      }
+      controlBitsIndexes = controlBitsIndexes.substring(0, controlBitsIndexes.length - 1);
+      return controlBitsIndexes;
+    })
+  }
+
+  convertIndexesArrayToBinaryString(indexesArray: string): string {
     return indexesArray.split(' ').map(data => {
       let parsedData = parseInt(data).toString(2);
-      if(parsedData.length < 4){
+      if (parsedData.length < 4) {
         return this.addZerosBeforeContent(parsedData, 4 - parsedData.length);
       } else {
         return parseInt(data).toString(2);
@@ -94,8 +120,8 @@ export class CodingService {
     }).join(' ');
   }
 
-  replaceAt(content: string, index: number, replacement: string): string{
-    return content.substring(0, index) + replacement + content.slice(index+1);
+  replaceAt(content: string, index: number, replacement: string): string {
+    return content.substring(0, index) + replacement + content.slice(index + 1);
   }
 
   reverseString(str: string): string {
@@ -106,7 +132,7 @@ export class CodingService {
     return content.substring(0, 3) + '0' + content.substring(3, 6) + '0' + content.charAt(6) + '00';
   }
 
-  addZerosBeforeContent(content: string, zeros: number): string{
+  addZerosBeforeContent(content: string, zeros: number): string {
     let newContent = '';
     for (let i = 0; i < zeros; i++) {
       newContent = newContent + '0';
@@ -114,6 +140,11 @@ export class CodingService {
     return newContent.concat(content);
   }
 
+  removeRedundandBitsFromHammingCodedContent(content: string): string {
+    return content.substring(0, 3) + content.substring(4, 7) + content.charAt(8);
+  }
+
+  //observables
   getCodedContent(): Observable<string> {
     return this.codedContentObs.asObservable();
   }

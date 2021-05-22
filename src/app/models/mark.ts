@@ -1,4 +1,5 @@
 export interface Mark {
   binaryCode: string;
-  isCorrect: boolean;
+  isCorrect?: boolean;
+  hammingCorrectedBit?: number;
 }
