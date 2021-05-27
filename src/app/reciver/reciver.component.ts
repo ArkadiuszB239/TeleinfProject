@@ -44,6 +44,10 @@ export class ReciverComponent implements OnInit {
         this.codingService.decodeBinaryContentCodedWithHamming(this.codedContent);
         break;
       }
+      case 'CRC16':{
+        this.codingService.decodeCRC(this.codedContent);
+        break;
+      }
       default: {
         throw new Error('Error while selecting coding type');
       }
@@ -58,6 +62,10 @@ export class ReciverComponent implements OnInit {
       }
       case 'HAMM': {
         this.decodedText = this.codingService.convertMarkArrayToText(this.checkedContent.map(data => ({binaryCode: this.removeRedundantBits(data.binaryCode)})));
+        break;
+      }
+      case 'CRC16':{
+        this.decodedText = this.codingService.decodeCRCToText(this.checkedContent);
         break;
       }
       default: {

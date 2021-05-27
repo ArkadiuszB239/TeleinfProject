@@ -37,6 +37,11 @@ export class SenderComponent implements OnInit {
         this.codingService.codeBinaryArrayWithHamming(this.binaryContent);
         break;
       }
+      case 'CRC16':{
+        this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
+        this.codingService.codeCRC(this.codingContent);
+        break;
+      }
       default: {
         throw new Error('Error while selecting coding type');
       }

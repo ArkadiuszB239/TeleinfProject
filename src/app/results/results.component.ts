@@ -63,6 +63,13 @@ export class ResultsComponent implements OnInit {
         this.undetectedErrors = this.getNumberOfDifferenceInArrays(data) - this.correctedErrors;
         break;
       }
+      case 'CRC16':{
+        this.bitsNumber = data.map(data => data.binaryCode.length).reduce((sum, x) => sum + x);
+        this.controlBits = data.length * 16;
+        this.detectedErrors = data.filter(data => !data.isCorrect).length;
+        this.undetectedErrors = this.getNumberOfDifferenceInArrays(data) - this.detectedErrors;
+        break;
+      }
       default: {
         throw new Error('Error while selecting coding type');
       }

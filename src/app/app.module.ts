@@ -9,6 +9,7 @@ import { ReciverComponent } from './reciver/reciver.component';
 import { GetBitsPipe } from './pipes/get-bits.pipe';
 import { SlicePipe } from './pipes/slice.pipe';
 import { ResultsComponent } from './results/results.component';
+import { GetBitsFromToPipe } from './pipes/get-bits-from-to.pipe';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { ResultsComponent } from './results/results.component';
     ReciverComponent,
     GetBitsPipe,
     SlicePipe,
-    ResultsComponent
+    ResultsComponent,
+    GetBitsFromToPipe
   ],
   imports: [
     BrowserModule,

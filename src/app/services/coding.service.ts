@@ -91,7 +91,10 @@ export class CodingService {
           mod2Sum = mod2Sum.concat('0');
         }
       }
-      this.checkedContent[i] = ({binaryCode: binaryContent[i], hammingCorrectedBit: parseInt(mod2Sum, 2) == 0 ? -1: parseInt(mod2Sum, 2) - 1});
+      this.checkedContent[i] = ({
+        binaryCode: binaryContent[i],
+        hammingCorrectedBit: parseInt(mod2Sum, 2) == 0 ? -1 : parseInt(mod2Sum, 2) - 1
+      });
     }
     console.log(this.checkedContent);
     this.checkedContentObs.next(this.checkedContent);
@@ -142,6 +145,62 @@ export class CodingService {
 
   removeRedundandBitsFromHammingCodedContent(content: string): string {
     return content.substring(0, 3) + content.substring(4, 7) + content.charAt(8);
+  }
+
+  //CRC-16
+  klucz = 0x18005;
+  keyLength = 16;
+
+  codeCRC(content: string): void {
+    this.codedContent =  content.split('').map(data => {
+      let tmp = data.charCodeAt(0).toString(2);
+      let dane = tmp.split('').map(bit => parseInt(bit));
+      return this.countCRC(dane).join('').substring(0, this.keyLength).concat(tmp);
+    }).join(' ');
+    this.codedContentObs.next(this.codedContent);
+    this.checkedContentBeforeCorrObs.next(
+      this.codedContent.split(' ').map(data => ({binaryCode: data}))
+    );
+  }
+
+  decodeCRC(content: string): void{
+    let codedContentArray = this.codedContent.split(' ');
+    let changedCodedContent = content.split(' ');
+    let mark: Array<Mark> = [];
+    for (let i = 0; i < changedCodedContent.length; i++) {
+      mark.push(this.compareContentsAfterCoding(codedContentArray[i], changedCodedContent[i]));
+    }
+    this.checkedContentObs.next(mark);
+
+  }
+
+  decodeCRCToText(content: Array<Mark>): string{
+    return content.map(data => String.fromCharCode(parseInt(data.binaryCode.slice(16), 2))).join('');
+  }
+
+  countCRC(bits: Array<number>): Array<number> {
+    let n = bits.length;
+    let temp = Array(this.keyLength).fill(0).concat(bits);
+    let tklucz = new Array<number>(this.keyLength + 1);
+    for (let i = 0; i < this.keyLength + 1; i++) {
+      if ((this.klucz & (1 << i)) == 0) tklucz[i] = 0; // ok
+      else tklucz[i] = 1;
+    }
+
+    // liczenie CRC
+    for (let start = n + this.keyLength - 1; start > this.keyLength - 1; start--) {
+      if (temp[start] == 1) {
+        for (let i = 0; i < this.keyLength + 1; i++) {
+          temp[start - i] = temp[start - i] ^ tklucz[this.keyLength - i];
+        }
+      }
+    }
+
+    return temp;
+  }
+
+  compareContentsAfterCoding(contentBefore: string, content: string): Mark{
+    return contentBefore == content ? ({binaryCode: content, isCorrect: true}) : ({binaryCode: content, isCorrect:false});
   }
 
   //observables
