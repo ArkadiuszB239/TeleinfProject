@@ -86,9 +86,9 @@
         <p>Zakodowany ciąg znaków po korekcji:</p>
       </div>
       <div class="col-10">
-        <span class="h2" *ngFor="let content of checkedContent">
-          <span [ngClass]="content.isCorrect ? 'text-warning' : 'text-info'">{{content.binaryCode | getBitsFromTo: [0, 16] }}</span>
-          <span [ngClass]="content.isCorrect ? 'text-success' : 'text-danger'">{{content.binaryCode | slice: 16 }} </span>
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i == 0" [ngClass]="content.isCorrect ? 'text-warning' : 'text-info'">{{content.binaryCode}} </span>
+          <span *ngIf="i != 0" [ngClass]="content.isCorrect ? 'text-success' : 'text-danger'">{{content.binaryCode}} </span>
         </span>
       </div>
     </div>
@@ -97,7 +97,102 @@
         <p>Dane wyjściowe:</p>
       </div>
       <div class="col-10">
-        <span class="h2" *ngFor="let content of checkedContent">{{content.binaryCode | slice : 16}} </span>
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i != 0">{{content.binaryCode}} </span>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <p>Tekst na wyjściu:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2">{{decodedText}} </span>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="codingTypeCode == 'CRC32'">
+    <div class="row">
+      <div class="col-2">
+        <p>Zakodowany ciąg znaków po korekcji:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i == 0" [ngClass]="content.isCorrect ? 'text-warning' : 'text-info'">{{content.binaryCode}} </span>
+          <span *ngIf="i != 0" [ngClass]="content.isCorrect ? 'text-success' : 'text-danger'">{{content.binaryCode}} </span>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <p>Dane wyjściowe:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i != 0">{{content.binaryCode}} </span>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <p>Tekst na wyjściu:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2">{{decodedText}} </span>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="codingTypeCode == 'CRCITU'">
+    <div class="row">
+      <div class="col-2">
+        <p>Zakodowany ciąg znaków po korekcji:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i == 0" [ngClass]="content.isCorrect ? 'text-warning' : 'text-info'">{{content.binaryCode}} </span>
+          <span *ngIf="i != 0" [ngClass]="content.isCorrect ? 'text-success' : 'text-danger'">{{content.binaryCode}} </span>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <p>Dane wyjściowe:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i != 0">{{content.binaryCode}} </span>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <p>Tekst na wyjściu:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2">{{decodedText}} </span>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="codingTypeCode == 'ATM'">
+    <div class="row">
+      <div class="col-2">
+        <p>Zakodowany ciąg znaków po korekcji:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i == 0" [ngClass]="content.isCorrect ? 'text-warning' : 'text-info'">{{content.binaryCode}} </span>
+          <span *ngIf="i != 0" [ngClass]="content.isCorrect ? 'text-success' : 'text-danger'">{{content.binaryCode}} </span>
+        </span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+        <p>Dane wyjściowe:</p>
+      </div>
+      <div class="col-10">
+        <span class="h2" *ngFor="let content of checkedContent, let i = index">
+          <span *ngIf="i != 0">{{content.binaryCode}} </span>
+        </span>
       </div>
     </div>
     <div class="row">

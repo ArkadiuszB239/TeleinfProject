@@ -15,6 +15,7 @@ export class ReciverComponent implements OnInit {
   codedLenght = 0;
   codingTypeCode = '';
   checkedContent: Array<Mark> = [];
+  contentBeforeCorr: Array<Mark> = [];
 
   constructor(private codingService: CodingService, private activeCoding: ActiveCodingService) {
   }
@@ -32,6 +33,7 @@ export class ReciverComponent implements OnInit {
       this.checkedContent = data;
       this.decodeBinaryContentToText();
     });
+    this.codingService.getCheckedContentBeforeCorr().subscribe(data => this.contentBeforeCorr = data);
   }
 
   code(): void {
@@ -45,7 +47,35 @@ export class ReciverComponent implements OnInit {
         break;
       }
       case 'CRC16':{
-        this.codingService.decodeCRC(this.codedContent);
+        this.codingService.decodeCrcWithChosedMethod(
+          this.contentBeforeCorr[0].binaryCode,
+          this.codedContent,
+          this.codingTypeCode
+        )
+        break;
+      }
+      case 'CRC32':{
+        this.codingService.decodeCrcWithChosedMethod(
+          this.contentBeforeCorr[0].binaryCode,
+          this.codedContent,
+          this.codingTypeCode
+        )
+        break;
+      }
+      case 'CRCITU':{
+        this.codingService.decodeCrcWithChosedMethod(
+          this.contentBeforeCorr[0].binaryCode,
+          this.codedContent,
+          this.codingTypeCode
+        )
+        break;
+      }
+      case 'ATM':{
+        this.codingService.decodeCrcWithChosedMethod(
+          this.contentBeforeCorr[0].binaryCode,
+          this.codedContent,
+          this.codingTypeCode
+        )
         break;
       }
       default: {
@@ -65,7 +95,19 @@ export class ReciverComponent implements OnInit {
         break;
       }
       case 'CRC16':{
-        this.decodedText = this.codingService.decodeCRCToText(this.checkedContent);
+        this.decodedText = this.codingService.convertMarkArrayToText(this.checkedContent.slice(1));
+        break;
+      }
+      case 'CRC32':{
+        this.decodedText = this.codingService.convertMarkArrayToText(this.checkedContent.slice(1));
+        break;
+      }
+      case 'CRCITU':{
+        this.decodedText = this.codingService.convertMarkArrayToText(this.checkedContent.slice(1));
+        break;
+      }
+      case 'ATM':{
+        this.decodedText = this.codingService.convertMarkArrayToText(this.checkedContent.slice(1));
         break;
       }
       default: {

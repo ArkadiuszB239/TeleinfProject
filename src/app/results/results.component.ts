@@ -65,9 +65,30 @@ export class ResultsComponent implements OnInit {
       }
       case 'CRC16':{
         this.bitsNumber = data.map(data => data.binaryCode.length).reduce((sum, x) => sum + x);
-        this.controlBits = data.length * 16;
-        this.detectedErrors = data.filter(data => !data.isCorrect).length;
-        this.undetectedErrors = this.getNumberOfDifferenceInArrays(data) - this.detectedErrors;
+        this.controlBits = 16;
+        this.detectedErrors = data.filter(data => !data.isCorrect).length > 0 ? 1 : 0;
+        this.undetectedErrors = this.detectedErrors > 0 ? this.getNumberOfDifferenceInArrays(data) - 1 : 0;
+        break;
+      }
+      case 'CRC32':{
+        this.bitsNumber = data.map(data => data.binaryCode.length).reduce((sum, x) => sum + x);
+        this.controlBits = 32;
+        this.detectedErrors = data.filter(data => !data.isCorrect).length > 0 ? 1 : 0;
+        this.undetectedErrors = this.detectedErrors > 0 ? this.getNumberOfDifferenceInArrays(data) - 1 : 0;
+        break;
+      }
+      case 'CRCITU':{
+        this.bitsNumber = data.map(data => data.binaryCode.length).reduce((sum, x) => sum + x);
+        this.controlBits = 16;
+        this.detectedErrors = data.filter(data => !data.isCorrect).length > 0 ? 1 : 0;
+        this.undetectedErrors = this.detectedErrors > 0 ? this.getNumberOfDifferenceInArrays(data) - 1 : 0;
+        break;
+      }
+      case 'ATM':{
+        this.bitsNumber = data.map(data => data.binaryCode.length).reduce((sum, x) => sum + x);
+        this.controlBits = 8;
+        this.detectedErrors = data.filter(data => !data.isCorrect).length > 0 ? 1 : 0;
+        this.undetectedErrors = this.detectedErrors > 0 ? this.getNumberOfDifferenceInArrays(data) - 1 : 0;
         break;
       }
       default: {

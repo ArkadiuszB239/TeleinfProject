@@ -15,6 +15,15 @@
       <li class="nav-item" [class.bg-secondary]="codingTypeCode == 'CRC16'">
         <a class="nav-link" (click)="setCodingTypeCode('CRC16')" href="#">Kodowanie CRC-16</a>
       </li>
+      <li class="nav-item" [class.bg-secondary]="codingTypeCode == 'CRC32'">
+        <a class="nav-link" (click)="setCodingTypeCode('CRC32')" href="#">Kodowanie CRC-32</a>
+      </li>
+      <li class="nav-item" [class.bg-secondary]="codingTypeCode == 'CRCITU'">
+        <a class="nav-link" (click)="setCodingTypeCode('CRCITU')" href="#">Kodowanie CRC-ITU</a>
+      </li>
+      <li class="nav-item" [class.bg-secondary]="codingTypeCode == 'ATM'">
+        <a class="nav-link" (click)="setCodingTypeCode('ATM')" href="#">Kodowanie ATM</a>
+      </li>
     </ul>
   </div>
 </nav>

@@ -147,60 +147,172 @@ export class CodingService {
     return content.substring(0, 3) + content.substring(4, 7) + content.charAt(8);
   }
 
-  //CRC-16
-  klucz = 0x18005;
-  keyLength = 16;
-
-  codeCRC(content: string): void {
-    this.codedContent =  content.split('').map(data => {
-      let tmp = data.charCodeAt(0).toString(2);
-      let dane = tmp.split('').map(bit => parseInt(bit));
-      return this.countCRC(dane).join('').substring(0, this.keyLength).concat(tmp);
-    }).join(' ');
-    this.codedContentObs.next(this.codedContent);
-    this.checkedContentBeforeCorrObs.next(
-      this.codedContent.split(' ').map(data => ({binaryCode: data}))
-    );
-  }
-
-  decodeCRC(content: string): void{
-    let codedContentArray = this.codedContent.split(' ');
-    let changedCodedContent = content.split(' ');
-    let mark: Array<Mark> = [];
-    for (let i = 0; i < changedCodedContent.length; i++) {
-      mark.push(this.compareContentsAfterCoding(codedContentArray[i], changedCodedContent[i]));
-    }
-    this.checkedContentObs.next(mark);
-
-  }
-
-  decodeCRCToText(content: Array<Mark>): string{
-    return content.map(data => String.fromCharCode(parseInt(data.binaryCode.slice(16), 2))).join('');
-  }
-
-  countCRC(bits: Array<number>): Array<number> {
-    let n = bits.length;
-    let temp = Array(this.keyLength).fill(0).concat(bits);
-    let tklucz = new Array<number>(this.keyLength + 1);
-    for (let i = 0; i < this.keyLength + 1; i++) {
-      if ((this.klucz & (1 << i)) == 0) tklucz[i] = 0; // ok
-      else tklucz[i] = 1;
-    }
-
-    // liczenie CRC
-    for (let start = n + this.keyLength - 1; start > this.keyLength - 1; start--) {
-      if (temp[start] == 1) {
-        for (let i = 0; i < this.keyLength + 1; i++) {
-          temp[start - i] = temp[start - i] ^ tklucz[this.keyLength - i];
-        }
+  //CRC
+  encodeCrcWithRegistry(content: Array<Array<number>>, codingMethod: string, coding: boolean): string {
+    let klucz: Array<number> = [];
+    switch (codingMethod) {
+      case 'CRC16': {
+        klucz = 0x8005.toString(2).split('').map(data => parseInt(data));
+        break;
+      }
+      case 'CRC32': {
+        klucz = Array(5).fill(0).concat(0x04C11DB7.toString(2).split('').map(data => parseInt(data)));
+        break;
+      }
+      case 'CRCITU':{
+        klucz = Array(3).fill(0).concat(0x1021.toString(2).split('').map(data => parseInt(data)));
+        break;
+      }
+      case 'ATM':{
+        klucz = Array(5).fill(0).concat(0x07.toString(2).split('').map(data => parseInt(data)));
+        break;
+      }
+      default: {
+        throw new Error('Error while selecting coding type');
       }
     }
 
-    return temp;
+    let keylength = klucz.length;
+    let rejestr = Array(keylength).fill(0);
+
+    let lastbit;
+    content.forEach(bytes => {
+      for (let i = 0; i < keylength; i++) {
+        rejestr[i] = rejestr[i] ^ bytes[i];
+      }
+
+      for (let i = 0; i < 8; i++) {
+        lastbit = rejestr.shift();
+        rejestr.push(0);
+        if (lastbit != 0) {
+          for (let j = 0; j < keylength; j++) {
+            rejestr[j] = rejestr[j] ^ klucz[j];
+          }
+        }
+      }
+    })
+    if (coding) {
+      this.codedContentObs.next(rejestr.join('').concat(' '.concat(content.map(bitArray => bitArray.join('').substring(0, 8)).join(' '))));
+      this.checkedContentBeforeCorrObs.next(
+        rejestr.join('').concat(' '.concat(content.map(data => data.join('').substring(0, 8)).join(' '))).split(' ').map(data => ({binaryCode: data}))
+      );
+    } else {
+      return rejestr.join('');
+    }
+    return '';
   }
 
-  compareContentsAfterCoding(contentBefore: string, content: string): Mark{
-    return contentBefore == content ? ({binaryCode: content, isCorrect: true}) : ({binaryCode: content, isCorrect:false});
+  convertStringToArraysOfBytes(content: string, codingMethod: string): Array<Array<number>> {
+    switch (codingMethod) {
+      case 'CRC16': {
+        return content.split('').map(data => {
+          let binary = '0'.concat(data.charCodeAt(0).toString(2));
+          return binary.split('').map(char => parseInt(char)).concat(Array(8).fill(0));
+        });
+      }
+      case 'CRC32': {
+        return content.split('').map(data => {
+          let binary = '0'.concat(data.charCodeAt(0).toString(2));
+          return binary.split('').map(char => parseInt(char)).concat(Array(24).fill(0));
+        });
+      }
+      case 'CRCITU': {
+        return content.split('').map(data => {
+          let binary = '0'.concat(data.charCodeAt(0).toString(2));
+          return binary.split('').map(char => parseInt(char)).concat(Array(8).fill(0));
+        });
+      }
+      case 'ATM': {
+        return content.split('').map(data => {
+          let binary = '0'.concat(data.charCodeAt(0).toString(2));
+          return binary.split('').map(char => parseInt(char));
+        });
+      }
+      default: {
+        throw new Error('Error while selecting coding type');
+      }
+    }
+  }
+
+  convertBinaryContentToArraysOfBytes(content: string, codingMethod: string): Array<Array<number>> {
+    switch (codingMethod) {
+      case 'CRC16': {
+        return content.split(' ').map(data => data.split('').map(bit => parseInt(bit)).concat(Array(8).fill(0)));
+      }
+      case 'CRC32': {
+        return content.split(' ').map(data => data.split('').map(bit => parseInt(bit)).concat(Array(24).fill(0)));
+      }
+      case 'CRCITU': {
+        return content.split(' ').map(data => data.split('').map(bit => parseInt(bit)).concat(Array(8).fill(0)));
+      }
+      case 'ATM': {
+        return content.split(' ').map(data => data.split('').map(bit => parseInt(bit)));
+      }
+      default: {
+        throw new Error('Error while selecting coding type');
+      }
+    }
+  }
+
+  decodeCrcWithChosedMethod(crcFromLastCoding: string, content: string, codingMethod: string): void {
+    let newCrc = '';
+    switch (codingMethod) {
+      case 'CRC16': {
+        newCrc = this.encodeCrcWithRegistry(
+          this.convertBinaryContentToArraysOfBytes(content.slice(crcFromLastCoding.length), codingMethod),
+          codingMethod,
+          false
+        );
+        this.checkedContentObs.next(
+          crcFromLastCoding == newCrc && crcFromLastCoding == content.split(' ')[0] ?
+            content.split(' ').map(data => ({binaryCode: data, isCorrect: true}))
+            : content.split(' ').map(data => ({binaryCode: data, isCorrect: false}))
+        )
+        break;
+      }
+      case 'CRC32': {
+        newCrc = this.encodeCrcWithRegistry(
+          this.convertBinaryContentToArraysOfBytes(content.slice(crcFromLastCoding.length), codingMethod),
+          codingMethod,
+          false
+        );
+        this.checkedContentObs.next(
+          crcFromLastCoding == newCrc && crcFromLastCoding == content.split(' ')[0] ?
+            content.split(' ').map(data => ({binaryCode: data, isCorrect: true}))
+            : content.split(' ').map(data => ({binaryCode: data, isCorrect: false}))
+        )
+        break;
+      }
+      case 'CRCITU': {
+        newCrc = this.encodeCrcWithRegistry(
+          this.convertBinaryContentToArraysOfBytes(content.slice(crcFromLastCoding.length), codingMethod),
+          codingMethod,
+          false
+        );
+        this.checkedContentObs.next(
+          crcFromLastCoding == newCrc && crcFromLastCoding == content.split(' ')[0] ?
+            content.split(' ').map(data => ({binaryCode: data, isCorrect: true}))
+            : content.split(' ').map(data => ({binaryCode: data, isCorrect: false}))
+        )
+        break;
+      }
+      case 'ATM': {
+        newCrc = this.encodeCrcWithRegistry(
+          this.convertBinaryContentToArraysOfBytes(content.slice(crcFromLastCoding.length), codingMethod),
+          codingMethod,
+          false
+        );
+        this.checkedContentObs.next(
+          crcFromLastCoding == newCrc && crcFromLastCoding == content.split(' ')[0] ?
+            content.split(' ').map(data => ({binaryCode: data, isCorrect: true}))
+            : content.split(' ').map(data => ({binaryCode: data, isCorrect: false}))
+        )
+        break;
+      }
+      default: {
+        throw new Error('Error while selecting coding type');
+      }
+    }
   }
 
   //observables

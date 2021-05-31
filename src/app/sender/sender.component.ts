@@ -32,14 +32,45 @@ export class SenderComponent implements OnInit {
         this.codingService.addParityBit(this.binaryContent);
         break;
       }
-      case 'HAMM':{
+      case 'HAMM': {
         this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
         this.codingService.codeBinaryArrayWithHamming(this.binaryContent);
         break;
       }
-      case 'CRC16':{
+      case 'CRC16': {
         this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
-        this.codingService.codeCRC(this.codingContent);
+        this.codingService.encodeCrcWithRegistry(
+          this.codingService.convertStringToArraysOfBytes(this.codingContent, this.codingTypeCode),
+          this.codingTypeCode,
+          true
+        );
+        break;
+      }
+      case 'CRC32': {
+        this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
+        this.codingService.encodeCrcWithRegistry(
+          this.codingService.convertStringToArraysOfBytes(this.codingContent, this.codingTypeCode),
+          this.codingTypeCode,
+          true
+        );
+        break;
+      }
+      case 'CRCITU': {
+        this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
+        this.codingService.encodeCrcWithRegistry(
+          this.codingService.convertStringToArraysOfBytes(this.codingContent, this.codingTypeCode),
+          this.codingTypeCode,
+          true
+        );
+        break;
+      }
+      case 'ATM': {
+        this.binaryContent = this.codingService.convertStringToBinaryArray(this.codingContent);
+        this.codingService.encodeCrcWithRegistry(
+          this.codingService.convertStringToArraysOfBytes(this.codingContent, this.codingTypeCode),
+          this.codingTypeCode,
+          true
+        );
         break;
       }
       default: {
